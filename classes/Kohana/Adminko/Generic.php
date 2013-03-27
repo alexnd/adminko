@@ -47,6 +47,7 @@ class Kohana_Adminko_Generic extends Adminko {
     {
         if($this->_viewable) {
             if($this->_use_layout) Adminko::init_layout_view();
+            //TODO: rename view to editor.php
             $view_edit = View::factory('adminko/edit');
             $view_edit->set('content', Adminko::$_cmsko->load($node));
             $view_edit->set('id', $node);

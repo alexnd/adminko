@@ -17,6 +17,7 @@ abstract class Kohana_Adminko {
     protected static $_button_view;
     protected static $_container_view;
 
+    // please use it later, not at this development iteration
     public static $is_developer = false;
 
     public function __construct($id, $config = array())
@@ -46,9 +47,9 @@ abstract class Kohana_Adminko {
                     $config = 'cmsko';
                 }
                 $config = Kohana::$config->load($config);
-                if(!is_array($config)) {
+                //if(!is_array($config)) {
                     //$config = $config->get('router');
-                }
+                //}
                 $type = isset($config['driver']) ? $config['driver'] : 'generic';
                 //TODO: try-catch ?
                 $class = 'Adminko_'.ucfirst($type);
@@ -92,7 +93,7 @@ abstract class Kohana_Adminko {
                 $class = 'Adminko_'.ucfirst($type);
                 Adminko::$_instances[$id] = new $class($id, $config);
                 Adminko::init_cmsko();
-                Adminko::check_edit_mode();
+                //Adminko::check_edit_mode();
             }
             return Adminko::$_instances[$id];
         }
@@ -113,11 +114,11 @@ abstract class Kohana_Adminko {
     public static function init_layout_view()
     {
         if( !isset(Adminko::$_layout_view) ) {
-            Adminko::$_layout_view = View::factory("adminko/modal-layout");
-            Adminko::$_layout_view->set('styles', array(0 => "/css/admin.css"));
-            Adminko::$_layout_view->set('scripts', array("/js/jquery-1.8.2.js",
-                "/js/jquery.simplemodal-1.4.2.js",
-                "/js/admin.js"));
+            Adminko::$_layout_view = View::factory('adminko/modal-layout');
+            Adminko::$_layout_view->set('styles', array(0 => '/css/admin.css'));
+            Adminko::$_layout_view->set('scripts', array('/js/jquery-1.9.1.js',
+                '/js/jquery.simplemodal-1.4.2.js',
+                '/js/admin.js'));
         }
     }
 
@@ -125,7 +126,7 @@ abstract class Kohana_Adminko {
     public static function render_button_view($id, $type = null, $content = null)
     {
         //construct the view only once
-        if( !isset(Adminko::$_button_view) ) Adminko::$_button_view = View::factory("adminko/button");
+        if( !isset(Adminko::$_button_view) ) Adminko::$_button_view = View::factory('adminko/button');
         Adminko::$_button_view->set('type', $type);
         Adminko::$_button_view->set('content', $content);
         Adminko::$_button_view->set('id', $id);
@@ -149,7 +150,7 @@ abstract class Kohana_Adminko {
     //display container for modal windows functionality
     public static function render_modal_container()
     {
-        if( !isset(Adminko::$_container_view) ) Adminko::$_container_view = View::factory("adminko/modal-container");
+        if( !isset(Adminko::$_container_view) ) Adminko::$_container_view = View::factory('adminko/modal-container');
         return Adminko::$_container_view->render();
     }
 
@@ -171,6 +172,12 @@ abstract class Kohana_Adminko {
         else {
             Adminko::$is_developer = ( '1' == trim(Cookie::get('developer', '')) ) ? true : false;
         }
+    }
+
+    // this is main security point. determines is user logged in and have admin role
+    public static function check_user_admin() {
+        return ( Auth::instance()->logged_in() &&
+            Auth::instance()->get_user()->is_admin );
     }
 
 } // End Adminko
