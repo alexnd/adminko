@@ -2,7 +2,7 @@
 
 //TODO: rename class to Kohana_Controller_Adminko
 
-class Kohana_Controller_Admin extends Controller
+class Kohana_Controller_Adminko extends Controller
 {
     public $logged_in = FALSE;
     public $current_user = NULL;
