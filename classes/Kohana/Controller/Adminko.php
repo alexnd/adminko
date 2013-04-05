@@ -1,6 +1,9 @@
-<?php defined('SYSPATH') or die('No direct script access.');
+<?php
+/*
+ * Adminko base controller
+ * */
+defined('SYSPATH') or die('No direct script access.');
 
-//TODO: rename class to Kohana_Controller_Adminko
 
 class Kohana_Controller_Adminko extends Controller
 {
@@ -31,30 +34,37 @@ class Kohana_Controller_Adminko extends Controller
         //parent::after();
     //}
 
-	
+    // auth only users with admin role and redirect them to admin panel
+    public function action_login() {}
+
+    // admin panel
 	public function action_index() {
 		echo 'adminko panel todo, checking: '.Adminko::check_user_admin();
         //$view = View::factory('adminko/edit');
         //echo $view->render();
 	}
 
-
+    // cms nodes editor
     public function action_editor() {
         //TODO: find the way to solve it INDEPENDENTLY of ->current_user->is_admin
         //if( $this->logged_in && $this->current_user->is_admin && Adminko::$is_developer ) {
         if( Adminko::check_user_admin() ) {
             $id = $this->request->param('id');
             if( $this->request->query('content') ) {
-                echo Kohana_Adminko::$_cmsko->load($id);
+                $this->response->body( Kohana_Adminko::$_cmsko->load($id) );
             }
             else {
                 $this->adminko->process_node_editor($id);
-                echo $this->adminko->render_node_editor($id);
+                $this->response->body( $this->adminko->render_node_editor($id) );
             }
         }
     }
 
-
-    //public function action_login() {}
-	
+	// delegate functions to external modules - we need to realize few basic CRUDs for important things (users, blog)
+    public function action_module() {
+        $params = explode('/', $this->request->param('id'));
+        $module = $params[0];
+        $id = isset($params[1]) ? $params[1] : '';
+        $this->response->body( Request::factory($module.'/adminkodelegate/'.$id)->execute()->body() );
+    }
 }

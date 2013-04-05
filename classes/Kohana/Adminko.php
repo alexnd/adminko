@@ -20,8 +20,7 @@ abstract class Kohana_Adminko {
     // please use it later, not at this development iteration
     public static $is_developer = false;
 
-    public function __construct($id, $config = array())
-    {
+    public function __construct($id, $config = array()) {
         $this->_id = $id;
         $this->_config = $config;
     }
@@ -31,17 +30,13 @@ abstract class Kohana_Adminko {
      *
      * @return Adminko
      */
-    public static function instance($config = null)
-    {
+    public static function instance($config = null) {
         // support for 1-array param usage
-        if( is_array($config) && array_key_exists('id', $config) && is_scalar($config['id']) )
-        {
+        if( is_array($config) && array_key_exists('id', $config) && is_scalar($config['id']) ) {
             return Adminko::factory($config['id'], $config);
         }
-        else
-        {
-            if ( !isset(Adminko::$_singleton) )
-            {
+        else {
+            if ( !isset(Adminko::$_singleton) ) {
                 if( !(is_string($config) && strlen($config)) )
                 {
                     $config = 'cmsko';
@@ -66,26 +61,20 @@ abstract class Kohana_Adminko {
      *
      * @return Adminko
      */
-    public static function factory($id = null, $config = null)
-    {
-        if ( is_scalar($id) )
-        {
-            if ( !isset(Adminko::$_instances[$id]) )
-            {
+    public static function factory($id = null, $config = null) {
+        if ( is_scalar($id) ) {
+            if ( !isset(Adminko::$_instances[$id]) ) {
                 //TODO: refactor config- stuff
-                if ( is_scalar($config) )
-                {
+                if ( is_scalar($config) ) {
                     $config = Kohana::$config->load($config);
                     if(!is_array($config)) {
                         $config = $config->get('cms_nodes');
                     }
                 }
-                if ( is_array($config) )
-                {
+                if ( is_array($config) ) {
                     $type = isset($config['driver']) ? $config['driver'] : 'generic';
                 }
-                else
-                {
+                else {
                     //TODO: what is that? why we here...
                     $type = 'generic';
                 }
@@ -105,26 +94,21 @@ abstract class Kohana_Adminko {
         if( !isset(Adminko::$_cmsko) ) Adminko::$_cmsko = Cmsko::instance(0);
     }
 
-    public function get_id()
-    {
+    public function get_id() {
         return $this->_id;
     }
 
     //construct the view only once
-    public static function init_layout_view()
-    {
+    public static function init_layout_view() {
         if( !isset(Adminko::$_layout_view) ) {
             Adminko::$_layout_view = View::factory('adminko/modal-layout');
-            Adminko::$_layout_view->set('styles', array(0 => '/css/admin.css'));
-            Adminko::$_layout_view->set('scripts', array('/js/jquery-1.9.1.js',
-                '/js/jquery.simplemodal-1.4.2.js',
-                '/js/admin.js'));
+            Adminko::$_layout_view->set('styles', array(0 => '/css/adminko.css'));
+            Adminko::$_layout_view->set('scripts', array('/js/jquery-1.9.1.js', '/js/adminko.js'));
         }
     }
 
     //rendering of edit control
-    public static function render_button_view($id, $type = null, $content = null)
-    {
+    public static function render_button_view($id, $type = null, $content = null) {
         //construct the view only once
         if( !isset(Adminko::$_button_view) ) Adminko::$_button_view = View::factory('adminko/button');
         Adminko::$_button_view->set('type', $type);
@@ -148,8 +132,7 @@ abstract class Kohana_Adminko {
     //abstract function render_toolbar();
 
     //display container for modal windows functionality
-    public static function render_modal_container()
-    {
+    public static function render_modal_container() {
         if( !isset(Adminko::$_container_view) ) Adminko::$_container_view = View::factory('adminko/modal-container');
         return Adminko::$_container_view->render();
     }
@@ -158,8 +141,7 @@ abstract class Kohana_Adminko {
     abstract function process_node_editor($node);
 
     //determines possibility to view edit-mode controls (get/cookie developer switcher
-    public static function check_edit_mode()
-    {
+    public static function check_edit_mode() {
         if(isset($_GET['developer'])) {
             if($_GET['developer']) {
                 Cookie::set('developer', '1');
