@@ -50,7 +50,7 @@ class Kohana_Controller_Adminko extends Controller
         //if( $this->logged_in && $this->current_user->is_admin && Adminko::$is_developer ) {
         if( Adminko::check_user_admin() ) {
             $id = $this->request->param('id');
-            if( $this->request->query('content') ) {
+            if( $this->request->query('editor_content') ) {
                 $this->response->body( Kohana_Adminko::$_cmsko->load($id) );
             }
             else {
@@ -62,9 +62,11 @@ class Kohana_Controller_Adminko extends Controller
 
 	// delegate functions to external modules - we need to realize few basic CRUDs for important things (users, blog)
     public function action_module() {
-        $params = explode('/', $this->request->param('id'));
-        $module = $params[0];
-        $id = isset($params[1]) ? $params[1] : '';
-        $this->response->body( Request::factory($module.'/adminkodelegate/'.$id)->execute()->body() );
+        if( Adminko::check_user_admin() ) {
+            $params = explode('/', $this->request->param('id'));
+            $module = $params[0];
+            $id = isset($params[1]) ? $params[1] : '';
+            $this->response->body( Request::factory($module.'/adminkodelegate/'.$id)->execute()->body() );
+        }
     }
 }

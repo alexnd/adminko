@@ -140,6 +140,7 @@ abstract class Kohana_Adminko {
     //process updating node content (if necessary)
     abstract function process_node_editor($node);
 
+    //TODO: remove?
     //determines possibility to view edit-mode controls (get/cookie developer switcher
     public static function check_edit_mode() {
         if(isset($_GET['developer'])) {

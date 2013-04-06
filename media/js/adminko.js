@@ -70,14 +70,31 @@ $g.adminko_apply_modal_controls = function() {
 // supply events for controls on a page
 $g.adminko_apply_controls = function() {
 
-    //TODO: fixme!
     $('.adminko-editor-button').click(function() {
         var id = $(this).attr('data-id'),
             ts = new Date().getTime(),
             url = $g.adminko_uri + '/editor/' + id;
+
+        $('#adminko-modal-header-content').text(
+            ((id) ? $('#adminko-modal-header-content').attr('data-edit-msg') :
+                $('#adminko-modal-header-content').attr('data-create-msg'))
+        );
+        $('#adminko-modal-button-save').attr({'data-id' : $(this).attr('data-id'), 'data-module' : 'editor'});
+        $('#adminko-modal-button-delete').hide();
+        $('#adminko-modal-button-save').show();
+
         $.get(url, {'ts':ts}, function(s) {
-            $('#modal-content').html(s);
+            $('#adminko-modal-content').html(s);
             setTimeout(function() {
+                //TODO: woraround with size
+                //$('#adminko-modal-container').css('width',(parseInt($(window).width())-50)+'px');
+                //$('#adminko-modal-container').css('height',(parseInt($(window).height())-100)+'px');
+                $('#c_editor_content').css('width','300px');
+                $('#c_editor_content').css('height','200px');
+                $('#editor_content').css('width','300px');
+                $('#editor_content').css('height','200px');
+                $('#adminko-modal-header').show();
+                $('#adminko-modal-content').show();
                 $('#adminko-modal-container').modal();
             }, 1200);
         }, 'html');
@@ -125,25 +142,56 @@ $g.adminko_apply_controls = function() {
     });
 }
 
+$g.adminko_onsave_editor = function(id, clb) {
+    if('string' == typeof(id)) {
+        var data = $('#adminko-form-editor').serializeObject(), url = $g.adminko_uri + '/editor/' + id;
+        data.is_ajax = 1;
+        data.ts = new Date().getTime();
+        $.post(url, data, function(r) {
+            // we try to edit page JS, so try to load and apply new version
+            if('js' == id) {
+                $.getScript(url + '?editor_content=1&ts=' + data.ts);
+            }
+            // try to reload CSS
+            else if('css' == id && $.support.htmlSerialize) {
+                $('<link>')
+                    .appendTo($('head'))
+                    .attr({type : 'text/css', rel : 'stylesheet'})
+                    .attr('href', url + '?editor_content=1&ts=' + data.ts);
+            }
+            // update id container
+            else {
+                $('#c_content_'+ id).html(r);
+            }
+            if('function'===typeof(clb)) clb.call(this);
+            else $('#adminko-modal-container').modal('hide');
+        }, 'html');
+    }
+}
+
+$g.adminko_render_editor = function(id, clb) {
+    var ts = new Date().getTime();
+    $('#c_content_'+ id).load( $g.adminko_uri + '/editor/' + id + '?editor_content=1&ts='+ts, function(){
+        if('function'===typeof(clb)) clb.call(this);
+    });
+}
+
 // example for supply your module
-/*
-$g.adminko_render_<module> = function() {
+/*$g.adminko_render_<module> = function() {
     $('#<module>_content').load('/<module>/partial', function(){
         $g.adminko_apply_controls();
     });
     $g.adminko_apply_blog();
 }
-
 $g.adminko_onsave_<module> = function(id, clb) {
     var data = $('#adminko-form-<module>').serializeObject();
     data.is_ajax = 1;
     data.ts = new Date().getTime();
     $.post($g.adminko_uri + '/module/<module>/' + id, data, function(r){
-        if('function'!==typeof(clb)) clb.call(this);
+        if('function'===typeof(clb)) clb.call(this);
         $g.adminko_render_<module>();
     }, 'json');
-}
-*/
+}*/
 
 $g.adminko_apply_modal_controls();
 $g.adminko_apply_controls();

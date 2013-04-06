@@ -17,7 +17,7 @@ class Kohana_Adminko_Generic extends Adminko {
         if( 'POST' == Request::initial()->method() ) {
             $this->_viewable = false;
             if($node) {
-                $content = Request::initial()->post('content');
+                $content = Request::initial()->post('editor_content');
                 Adminko::$_cmsko->save($node, $content);
                 echo $content;
                 $this->_jsonable = false;
@@ -49,7 +49,7 @@ class Kohana_Adminko_Generic extends Adminko {
             if($this->_use_layout) Adminko::init_layout_view();
             //TODO: rename view to editor.php
             $view_edit = View::factory('adminko/edit');
-            $view_edit->set('content', Adminko::$_cmsko->load($node));
+            $view_edit->set('editor_content', Adminko::$_cmsko->load($node));
             $view_edit->set('id', $node);
             if($this->_use_layout) {
                 Adminko::$_layout_view->set('content', $view_edit->render());
